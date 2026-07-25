@@ -20,6 +20,8 @@ pnpm build
 先在不访问 RPC 的情况下验证工具链：
 
 ```bash
+pnpm typecheck
+pnpm lint
 pnpm test:offline
 ```
 
