@@ -6,11 +6,15 @@ export default defineConfig({
   // transform must lower them (ADR 0001 toolchain constraint). This is also
   // why the repo pins vitest 3 — vite 8's oxc does not lower them.
   esbuild: { target: "es2022" },
+  test: {
+    include: ["test/**/*.test.ts", "test-online/live-mainnet.test.ts"],
+  },
   resolve: {
-    // Tests run against core's source, not its dist, so a stale build can
+    // Tests run against workspace sources, not dists, so a stale build can
     // never produce phantom failures.
     alias: {
       "@themoss/core": fileURLToPath(new URL("../../core/src/index.ts", import.meta.url)),
+      "@themoss/system": fileURLToPath(new URL("../../system/src/index.ts", import.meta.url)),
     },
   },
 });

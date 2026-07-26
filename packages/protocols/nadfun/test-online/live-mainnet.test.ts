@@ -4,11 +4,12 @@ import { describe, expect, it } from "vitest";
 import {
   NADFUN_LENS_ADDRESS,
   NadFun,
-  type NadFunQuote,
+  type NadFunBuyQuote,
+  type NadFunSellQuote,
   type NadFunTokenStatus,
 } from "../src/index.js";
 
-const RPC_URL = process.env.MONAD_RPC_URL ?? "https://rpc.monad.xyz";
+const RPC_URL = process.env.MOSS_RPC_URL ?? "https://rpc.monad.xyz";
 
 const SAMPLE_TOKEN = getAddress(
   process.env.NADFUN_SAMPLE_TOKEN ?? "0xe85170a4303cBA6DD224628F5Aa052fb7FeB7777",
@@ -24,7 +25,7 @@ function queryData<T>(result: Awaited<ReturnType<Registry["action"]>>): T {
   return result.data as T;
 }
 
-describe("Nad.fun Lens live Monad mainnet", () => {
+describe.skipIf(!!process.env.MOSS_SKIP_E2E)("Nad.fun Lens live Monad mainnet", () => {
   it("verifies deployment and executes all three Query methods", { timeout: 60_000 }, async () => {
     const client = createPublicClient({
       transport: http(RPC_URL, {
@@ -69,7 +70,7 @@ describe("Nad.fun Lens live Monad mainnet", () => {
       amountIn: "1000000000000000000",
     });
 
-    const buy = queryData<NadFunQuote>(buyResult);
+    const buy = queryData<NadFunBuyQuote>(buyResult);
 
     expect(buy.side).toBe("buy");
     expect(buy.token).toBe(SAMPLE_TOKEN);
@@ -87,7 +88,7 @@ describe("Nad.fun Lens live Monad mainnet", () => {
       amountIn: buy.amountOut,
     });
 
-    const sell = queryData<NadFunQuote>(sellResult);
+    const sell = queryData<NadFunSellQuote>(sellResult);
 
     expect(sell.side).toBe("sell");
     expect(sell.token).toBe(SAMPLE_TOKEN);
