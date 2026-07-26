@@ -21,15 +21,25 @@ const PositiveBaseUnitAmount = UnsignedIntegerString.refine(
   "Amount must be greater than zero.",
 ).describe("A positive base-10 integer amount in the asset's smallest unit.");
 
-const quoteParams = {
+const quoteBuyParams = {
   token: {
     type: Address,
-    description: "Nad.fun token whose buy or sell output is requested.",
+    description: "The Nad.fun token to buy.",
   },
   amountIn: {
     type: PositiveBaseUnitAmount,
-    description:
-      "Exact input amount in base units: wei for MON buys or token base units for sells.",
+    description: "Exact input amount of native MON for the buy, in wei.",
+  },
+} satisfies ParamsSpec;
+
+const quoteSellParams = {
+  token: {
+    type: Address,
+    description: "The Nad.fun token to sell.",
+  },
+  amountIn: {
+    type: PositiveBaseUnitAmount,
+    description: "Exact input amount of the Nad.fun token, in its smallest base units.",
   },
 } satisfies ParamsSpec;
 
@@ -40,13 +50,23 @@ const statusParams = {
   },
 } satisfies ParamsSpec;
 
-export interface NadFunQuote {
-  side: "buy" | "sell";
+export interface NadFunBuyQuote {
+  side: "buy";
   token: AddressValue;
   amountIn: string;
   router: AddressValue;
   amountOut: string;
 }
+
+export interface NadFunSellQuote {
+  side: "sell";
+  token: AddressValue;
+  amountIn: string;
+  router: AddressValue;
+  amountOut: string;
+}
+
+export type NadFunQuote = NadFunBuyQuote | NadFunSellQuote;
 
 export interface NadFunTokenStatus {
   token: AddressValue;
@@ -74,10 +94,10 @@ export class NadFun {
 
   @Query({
     intent: "Quote a Nad.fun token buy through the protocol-selected router",
-    params: quoteParams,
+    params: quoteBuyParams,
     tags: ["quote", "buy", "bonding-curve"],
   })
-  async quoteBuy(params: InferParams<typeof quoteParams>): Promise<NadFunQuote> {
+  async quoteBuy(params: InferParams<typeof quoteBuyParams>): Promise<NadFunBuyQuote> {
     const [router, amountOut] = await this.lens.read.getAmountOut([
       params.token,
       BigInt(params.amountIn),
@@ -95,10 +115,10 @@ export class NadFun {
 
   @Query({
     intent: "Quote a Nad.fun token sell through the protocol-selected router",
-    params: quoteParams,
+    params: quoteSellParams,
     tags: ["quote", "sell", "bonding-curve"],
   })
-  async quoteSell(params: InferParams<typeof quoteParams>): Promise<NadFunQuote> {
+  async quoteSell(params: InferParams<typeof quoteSellParams>): Promise<NadFunSellQuote> {
     const [router, amountOut] = await this.lens.read.getAmountOut([
       params.token,
       BigInt(params.amountIn),

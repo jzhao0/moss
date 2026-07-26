@@ -85,26 +85,59 @@ describe("NadFun", () => {
       ]),
     );
 
-    const [loaded] = registry.load([
+    const [buyLoaded] = registry.load([
       {
         protocol: "nadfun",
         method: "quoteBuy",
       },
     ]);
 
-    expect(loaded).toMatchObject({
+    if (!buyLoaded) {
+      throw new Error("quoteBuy load result is undefined");
+    }
+
+    expect(buyLoaded).toMatchObject({
       kind: "query",
       risk: [],
       tags: ["quote", "buy", "bonding-curve"],
       params: {
         token: {
-          description: expect.stringContaining("token"),
+          description: expect.stringContaining("buy"),
+        },
+        amountIn: {
+          description: expect.stringContaining("wei"),
+        },
+      },
+    });
+
+    const [sellLoaded] = registry.load([
+      {
+        protocol: "nadfun",
+        method: "quoteSell",
+      },
+    ]);
+
+    if (!sellLoaded) {
+      throw new Error("quoteSell load result is undefined");
+    }
+
+    expect(sellLoaded).toMatchObject({
+      kind: "query",
+      risk: [],
+      tags: ["quote", "sell", "bonding-curve"],
+      params: {
+        token: {
+          description: expect.stringContaining("sell"),
         },
         amountIn: {
           description: expect.stringContaining("base units"),
         },
       },
     });
+
+    expect((buyLoaded.params.amountIn as { description: string }).description).not.toEqual(
+      (sellLoaded.params.amountIn as { description: string }).description,
+    );
   });
 
   it("quotes a buy with exact base-unit input", async () => {
