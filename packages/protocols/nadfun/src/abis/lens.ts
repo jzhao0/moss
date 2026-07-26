@@ -7,9 +7,12 @@
 //   file:     sha256 679d4f19e46f7f74aad0ac99f5beb485298caea61b0125f3b1222d4b3e87fadd
 //   vendored: 2026-07-25
 //   verification: all Query methods are exercised live on Monad mainnet;
-//   the direct Lens deployment is checked for bytecode and a zero ERC-1967
-//   implementation slot. The vendored ABI is independently cross-checked
-//   against Monadscan by `pnpm test:abi:online`.
+//   the Lens deployment is checked for deployed bytecode; every required
+//   function selector is searched in that bytecode. Monadscan does not
+//   currently report a verified source for this contract, so the keyed
+//   `pnpm test:abi:online` suite performs an honest degraded verification
+//   and expects explorer fetch to fail with "Contract source code not
+//   verified" rather than inventing an independent anchor.
 
 export const NadFunLensAbi = [
   {

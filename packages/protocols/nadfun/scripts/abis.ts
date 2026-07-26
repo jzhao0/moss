@@ -111,9 +111,12 @@ export function generate(packageRoot: string): string {
 //   file:     sha256 ${vendor.fileSha256}
 //   vendored: ${vendor.vendoredAt}
 //   verification: all Query methods are exercised live on Monad mainnet;
-//   the direct Lens deployment is checked for bytecode and a zero ERC-1967
-//   implementation slot. The vendored ABI is independently cross-checked
-//   against Monadscan by \`pnpm test:abi:online\`.
+//   the Lens deployment is checked for deployed bytecode; every required
+//   function selector is searched in that bytecode. Monadscan does not
+//   currently report a verified source for this contract, so the keyed
+//   \`pnpm test:abi:online\` suite performs an honest degraded verification
+//   and expects explorer fetch to fail with "Contract source code not
+//   verified" rather than inventing an independent anchor.
 
 export const NadFunLensAbi = ${JSON.stringify(abi, null, 2)} as const;
 `;

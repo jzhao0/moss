@@ -114,6 +114,10 @@ pnpm --filter @themoss/protocol-nadfun test
 pnpm exec biome check packages/protocols/nadfun
 ```
 
+`pnpm --filter @themoss/protocol-nadfun test` now runs both the offline unit
+suite and the live Monad mainnet suite. Use `MOSS_SKIP_E2E=1` or the root
+`pnpm test:offline` to skip live RPC calls while keeping all offline checks.
+
 ## Live Monad Mainnet Verification
 
 The online suite checks:
@@ -136,9 +140,15 @@ pnpm --filter @themoss/protocol-nadfun test:online
 Override the defaults without committing credentials or local values:
 
 ```bash
-MONAD_RPC_URL=https://your-rpc.example \
+MOSS_RPC_URL=https://your-rpc.example \
 NADFUN_SAMPLE_TOKEN=0xYourTokenAddress \
 pnpm --filter @themoss/protocol-nadfun test:online
+```
+
+To skip the live mainnet suite while still running all offline tests:
+
+```bash
+MOSS_SKIP_E2E=1 pnpm --filter @themoss/protocol-nadfun test
 ```
 
 ## ABI Maintenance
@@ -149,7 +159,7 @@ Committed provenance inputs:
 
 - `abis-src/ILens.json`: verbatim upstream ABI;
 - `abis-src/VENDOR.json`: repository, full Git commit, file path, SHA-256, and vendoring date;
-- `abis.json`: the fixed direct Monad mainnet deployment used for the Explorer cross-check.
+- `abis.json`: the fixed Monad mainnet deployment address used for the degraded on-chain verification.
 
 Offline regeneration:
 
@@ -169,7 +179,7 @@ Reproduce a specific reviewed commit:
 pnpm --filter @themoss/protocol-nadfun update:abis 35ca13bd26bb2a5418698b13ddcd07008eecc30a
 ```
 
-The keyed Monadscan cross-check is separate from the normal offline suite:
+The keyed online verification is separate from the normal offline suite:
 
 ```bash
 MONADSCAN_API_KEY=your_local_key \
@@ -177,3 +187,21 @@ pnpm --filter @themoss/protocol-nadfun test:abi:online
 ```
 
 Never commit or paste the API key into source files, test output, issues, or pull requests.
+
+### Honest degraded verification
+
+Monadscan currently reports that the Lens source is not verified. The online
+suite therefore does not claim an explorer-verified ABI cross-check. Instead it
+records:
+
+- the upstream Git repository, commit, file path, and SHA-256;
+- deterministic regeneration from committed inputs;
+- the fixed address from the upstream README;
+- deployed bytecode on Monad mainnet;
+- presence of every required function selector in that bytecode;
+- successful live execution of all three Query methods.
+
+If Monadscan later verifies the source, the keyed assertion in
+`test:abi:online` will fail with "Contract source code not verified" no longer
+matching reality, forcing a human to re-audit the ABI before restoring a full
+explorer cross-check.
