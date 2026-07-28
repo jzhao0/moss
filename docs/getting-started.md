@@ -20,8 +20,8 @@ pnpm build
 Prove the toolchain without making RPC calls:
 
 ```bash
-pnpm typecheck
 pnpm lint
+pnpm typecheck
 pnpm test:offline
 ```
 
