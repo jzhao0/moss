@@ -1,4 +1,4 @@
-import { type MossRuntime, Registry } from "@themoss/core";
+import { defaultRpcUrl, type MossRuntime, Registry } from "@themoss/core";
 import { createPublicClient, getAddress, http } from "viem";
 import { describe, expect, it } from "vitest";
 import {
@@ -9,7 +9,7 @@ import {
   type NadFunTokenStatus,
 } from "../src/index.js";
 
-const RPC_URL = process.env.MOSS_RPC_URL ?? "https://rpc.monad.xyz";
+const RPC_URL = defaultRpcUrl();
 
 const SAMPLE_TOKEN = getAddress(
   process.env.NADFUN_SAMPLE_TOKEN ?? "0xe85170a4303cBA6DD224628F5Aa052fb7FeB7777",

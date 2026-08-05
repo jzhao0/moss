@@ -31,6 +31,7 @@
  */
 import { readFileSync } from "node:fs";
 import { fetchAbi } from "@themoss/abi-tools";
+import { defaultRpcUrl } from "@themoss/core";
 import {
   type Abi,
   type Address,
@@ -52,7 +53,7 @@ const manifest = JSON.parse(
   readFileSync(new URL("../abis.json", import.meta.url), "utf8"),
 ) as AbiManifest;
 
-const RPC_URL = process.env.MOSS_RPC_URL ?? "https://rpc.monad.xyz";
+const RPC_URL = defaultRpcUrl();
 
 describe("Nad.fun Lens ABI degraded verification", () => {
   it("pins the Lens address used by the adapter", () => {
